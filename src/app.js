@@ -11,6 +11,10 @@ const livros = [
     {
         id: 2,
         titulo: "O Hobbit"
+    },
+    {
+        id: 3,
+        titulo: "Livro teste"
     }
 ]
 
@@ -22,6 +26,12 @@ function buscaLivro(id) {
 
 function filtraLivro(id) {
     return livros.filter(livro => livro.id === Number(id))
+}
+
+function excluiLivro(id){
+    const novaLista = livros.filter(livro => livro.id !== Number(id));
+    console.log(novaLista);
+    return novaLista
 }
 
 app.get('/', (req, res) => {
@@ -55,10 +65,15 @@ app.put("/livros/:idLivroASerAlterado", (req, res) => {
     }
     livroFiltrado.map(item => item.titulo = req.body.titulo );
     res.status(200).json(livros);
-    
+
     // const index = buscaLivro(req.params.idLivroASerAlterado)
     // livros[index].titulo = req.body.titulo;
     // res.status(200).json(livros)
+})
+
+app.delete("/livros/:idLivroASerExcluido", (req, res) => {
+    excluiLivro(req.params.idLivroASerExcluido)
+    res.status(200).send("Livro excluído com sucesso");
 })
 
 export default app;
