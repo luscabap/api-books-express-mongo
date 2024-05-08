@@ -1,4 +1,15 @@
-import express from 'express'
+import express from 'express';
+import conectaNaDataBase from './config/dbConnect.js';
+
+const conexao = await conectaNaDataBase();
+
+conexao.on("error", (erro) => {
+    console.error("erro de conexão", erro);
+})
+
+conexao.once("open", () => {
+    console.error("Conexão com o banco feita com sucesso");
+})
 
 const app = express();
 app.use(express.json())
