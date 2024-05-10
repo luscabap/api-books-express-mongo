@@ -26,9 +26,11 @@ class LivroController {
 
         try {
             const livrosPorEditora = await livro.find({ editora: editora })
-            res.status(200).json(livrosPorEditora)
+            if (livrosPorEditora.length > 0) {
+                res.status(200).json(livrosPorEditora)
+            } else throw new Error
         } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - Falha na requisição do livro :C` })
+            res.status(500).json({ message: `${erro} - Falha na requisição do livro :C` })
         }
     }
 
