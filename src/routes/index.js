@@ -5,8 +5,7 @@ import autores from './autoresRoutes.js';
 const routes = (app) => {
     app.route('/').get((req, res) => res.status(200).send("Curso de Node.JS"));
 
-    app.use(express.json(), livros);
-    app.use(express.json(), autores);
+    app.use(express.json(), livros, autores);
 };
 
 export default routes;
