@@ -21,13 +21,23 @@ class LivroController {
         }
     }
     
+    static async listarLivroPorEditora(req, res){
+        const editora = req.query.editora;
+
+        try {
+            const livrosPorEditora = await livro.find({ editora: editora })
+            res.status(200).json(livrosPorEditora)
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - Falha na requisição do livro :C` })
+        }
+    }
+
     static async cadastrarLivro(req, res){
         const novoLivro = req.body;
 
         try {
             const autorEncontrado = await autor.findById(novoLivro.autor);
             const livroCompleto = { ...novoLivro, autor: { ...autorEncontrado._doc } };
-            console.log(livroCompleto);
             const livroCriado = await livro.create(livroCompleto);
             res.status(201).json({ message: "Livro criado com sucesso", livro: livroCriado});
         } catch (erro) {
