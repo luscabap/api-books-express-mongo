@@ -1,5 +1,6 @@
 import livro from "../models/Livro.js";
 import { autor } from "../models/Autor.js";
+import { editora } from '../models/Editora.js';
 
 class LivroController {
     static async listarLivros(req, res) {
@@ -22,15 +23,26 @@ class LivroController {
     }
     
     static async listarLivroPorEditora(req, res){
-        const editora = req.query.editora;
-
+        const editoraASerEncontrada = req.query.editora;
         try {
-            const livrosPorEditora = await livro.find({ editora: editora })
+            const livrosPorEditora = await livro.find({ "editora.nome": editoraASerEncontrada });
             if (livrosPorEditora.length > 0) {
                 res.status(200).json(livrosPorEditora)
             } else throw new Error
         } catch (erro) {
-            res.status(500).json({ message: `${erro} - Falha na requisição do livro :C` })
+            res.status(500).json({ message: `${erro} - Falha na requisição do livro :C` });
+        }
+    }
+
+    static async listarLivroPorAutor(req, res){
+        const autorASerEncontrado = req.query.autor;
+        try {
+            const livrosPorAutor = await livro.find({ "autor.nome": autorASerEncontrado });
+            if (livrosPorAutor.length > 0){
+                res.status(200).json(livrosPorAutor)
+            } else throw new Error
+        } catch (error) {
+            res.status(500).json({ message: `Erro: ${error}` })
         }
     }
 
@@ -39,7 +51,8 @@ class LivroController {
 
         try {
             const autorEncontrado = await autor.findById(novoLivro.autor);
-            const livroCompleto = { ...novoLivro, autor: { ...autorEncontrado._doc } };
+            const editoraEncontrada = await editora.findById(novoLivro.editora);
+            const livroCompleto = { ...novoLivro, autor: { ...autorEncontrado._doc }, editora: { ...editoraEncontrada._doc } };
             const livroCriado = await livro.create(livroCompleto);
             res.status(201).json({ message: "Livro criado com sucesso", livro: livroCriado});
         } catch (erro) {
