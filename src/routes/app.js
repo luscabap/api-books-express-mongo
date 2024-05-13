@@ -1,7 +1,7 @@
 import express from "express";
 import db from "../config/dbConnect.js";
 import routes from "./index.js";
-import mongoose from "mongoose";
+import manipuladorDeErros from "../middlewares/manipuladoDeErros.js";
 
 db.on("error", (erro) => {
   console.log.bind(console, `erro de conexão - ${erro}`);
@@ -17,13 +17,8 @@ app.use(express.json());
 
 routes(app);
 
-// eslint-disable-next-line no-unused-vars
-app.use((erro, req, res, next) => {
-  if (erro instanceof mongoose.Error.CastError){
-    res.status(400).send({ message: "ID inválido. Por favor, verifique e tente novamente!" });
-  } else {
-    res.status(500).send({ message: "Erro interno de servidor" });
-  }
-});
+
+
+app.use(manipuladorDeErros);
 
 export default app;
