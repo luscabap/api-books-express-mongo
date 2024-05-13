@@ -5,7 +5,10 @@ import { editora } from '../models/Editora.js';
 class LivroController {
     static async listarLivros(req, res) {
         try {
-            const listaLivros = await livro.find({});
+            const listaLivros = await livro.find()
+            .populate("autor")
+            .exec()
+            
             res.status(200).json(listaLivros);       
         } catch (erro) {
             res.status(500).json({ message: `${erro} - Erro ao fazer a requisição` });

@@ -1,11 +1,11 @@
 import express from 'express';
-import conectaNaDataBase from './config/dbConnect.js';
-import routes from './routes/index.js';
+import conectaNaDataBase from '../config/dbConnect.js';
+import routes from './index.js';
 
 const conexao = await conectaNaDataBase();
 
 conexao.on("error", (erro) => {
-    console.error("erro de conexão", erro);
+    console.log.bind(console, `erro de conexão - ${erro}`);
 })
 
 conexao.once("open", () => {
