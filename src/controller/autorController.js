@@ -1,26 +1,30 @@
 import { autor } from "../models/Autor.js";
 
 class AutorController {
-  static async listarAutores(req, res) {
+  static async listarAutores(req, res, next) {
     try {
       const listaAutores = await autor.find({});
       res.status(200).json(listaAutores);
-    } catch (erro) {
-      res.status(500).json({ message: `${erro} - Erro ao fazer a requisição` });
+    } catch (error) {
+      next(error);
     }
   }
 
-  static async listarAutorEspecifico(req, res) {
+  static async listarAutorEspecifico(req, res, next) {
     try {
       const id = req.params.idAutor;
       const autorFiltrado = await autor.findById(id);
-      res.status(200).json(autorFiltrado);
+      if (autorFiltrado !== null) {
+        res.status(200).json(autorFiltrado);
+      } else {
+        res.status(404).send({ message: "ID do autor não localizado" });
+      }
     } catch (error) {
-      console.error(error);
+      next(error);
     }
   }
 
-  static async criarAutor(req, res) {
+  static async criarAutor(req, res, next) {
     try {
       const infosAutor = req.body;
       const autorCriado = await autor.create(infosAutor);
@@ -28,26 +32,22 @@ class AutorController {
         .status(201)
         .json({ message: "Autor criado com sucesso!", autor: autorCriado });
     } catch (error) {
-      console.error("Erro", error);
-      res.status(500).json({ message: "Erro ao criar o autor :C" });
+      next(error);
     }
   }
 
-  static async editarAutor(req, res) {
+  static async editarAutor(req, res, next) {
     try {
       const id = req.params.idAutorASerEditado;
       const informacoesNovas = req.body;
       await autor.findByIdAndUpdate(id, informacoesNovas);
       res.status(201).json({ message: "Autor(a) alterado com sucesso!" });
     } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .json({ message: `Erro ao criar o autor ${error}`, erro: error });
+      next(error);
     }
   }
 
-  static async excluirAutor(req, res) {
+  static async excluirAutor(req, res, next) {
     try {
       const id = req.params.idAutorASerExcluido;
       await autor.findByIdAndRemove(id);
@@ -55,8 +55,7 @@ class AutorController {
         .status(200)
         .json({ message: `O Autor com id ${id} excluído com sucesso!` });
     } catch (error) {
-      res.send(500).json({ message: "Erro ao excluir o autor :C" });
-      console.error(`Erro ${error}`);
+      next(error);
     }
   }
 }
