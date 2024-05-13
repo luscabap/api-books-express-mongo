@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const editoraSchema = new mongoose.Schema({
-    id: { type: mongoose.Schema.Types.ObjectId },
-    nome: { type: String, required: true },
-    porte: { type: String }
+  id: { type: mongoose.Schema.Types.ObjectId },
+  nome: { type: String, required: true },
+  porte: { type: String }
 }, { versionKey: false });
 
 const editora = mongoose.model("editoras", editoraSchema);

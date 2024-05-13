@@ -13,15 +13,8 @@
     },
     "rules": {
       "indent": ["error", 2],
-      "quotes": ["error", "single"],
+      "quotes": ["error", "double"],
       "semi": ["error", "always"],
-      "no-console": "warn",
-      "no-unused-vars": "error",
-      "camelcase": "error",
-      "max-len": ["error", { "code": 80 }],
-      "no-undef": "error",
-      "no-mixed-spaces-and-tabs": "error",
-      "arrow-spacing": "error",
       "no-extra-semi": "error",
       "no-trailing-spaces": "error"
     }
