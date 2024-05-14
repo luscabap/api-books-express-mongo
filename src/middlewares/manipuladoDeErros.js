@@ -8,8 +8,14 @@ function manipuladorDeErros(erro, req, res, next) {
       .send({
         message: "ID inválido. Por favor, verifique e tente novamente!",
       });
+  } else if (erro instanceof mongoose.Error.ValidationError){
+    const mensagensErro = Object.values(erro.errors)
+      .map(erroAtual => erroAtual.message)
+      .join("; ");
+    res.status(400).send({ message: `Os seguintes erros foram encontrados: ${mensagensErro}` });
   } else {
     res.status(500).send({ message: "Erro interno de servidor" });
+    console.log(erro);
   }
 }
 
