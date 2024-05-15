@@ -1,20 +1,19 @@
 import mongoose from "mongoose";
+import ErroBase from "../errors/ErroBase.js";
+import RequisicaoIncorreta from "../errors/RequisicaoIncorreta.js";
+import ErroValidacao from "../errors/ErroValidacao.js";
+import NaoEncontrado from "../errors/NaoEncontrado.js";
 
 // eslint-disable-next-line no-unused-vars
 function manipuladorDeErros(erro, req, res, next) {
   if (erro instanceof mongoose.Error.CastError) {
-    res
-      .status(400)
-      .send({
-        message: "ID inválido. Por favor, verifique e tente novamente!",
-      });
+    new RequisicaoIncorreta().enviarResposta(res);
   } else if (erro instanceof mongoose.Error.ValidationError){
-    const mensagensErro = Object.values(erro.errors)
-      .map(erroAtual => erroAtual.message)
-      .join("; ");
-    res.status(400).send({ message: `Os seguintes erros foram encontrados: ${mensagensErro}` });
+    new ErroValidacao(erro).enviarResposta(res);
+  } else if (erro instanceof NaoEncontrado){
+    erro.enviarResposta(res);
   } else {
-    res.status(500).send({ message: "Erro interno de servidor" });
+    new ErroBase().enviarResposta(res);
     console.log(erro);
   }
 }
