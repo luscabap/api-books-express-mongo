@@ -13,7 +13,11 @@ const livroSchema = new mongoose.Schema({
     type: Number,
     required: [true, "O campo preco do livro é obrigatório. Por favor, verifique novamente."]
   },
-  paginas: { type: Number },
+  paginas: {
+    type: Number,
+    min: 10,
+    max: 5000
+  },
   autor: autorSchema
 }, { versionKey: false });
 

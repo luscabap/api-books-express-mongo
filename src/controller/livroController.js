@@ -1,6 +1,7 @@
 import livro from "../models/Livro.js";
 import { autor } from "../models/Autor.js";
 import { editora } from "../models/Editora.js";
+import NaoEncontrado from "../errors/NaoEncontrado.js";
 
 class LivroController {
   static async listarLivros(req, res, next) {
@@ -19,7 +20,11 @@ class LivroController {
     try {
       const id = req.params.idLivro;
       const livroFiltrado = await livro.findById(id);
-      res.status(200).json(livroFiltrado);
+      if (livroFiltrado !== null) {
+        res.status(200).json(livroFiltrado);
+      } else {
+        next(new NaoEncontrado("O ID do livro não foi encontrado", 404));
+      }
     } catch (error) {
       next(error);
     }
@@ -31,7 +36,9 @@ class LivroController {
       const livrosPorEditora = await livro.find({ "editora.nome": editoraASerEncontrada });
       if (livrosPorEditora.length > 0) {
         res.status(200).json(livrosPorEditora);
-      } else throw new Error;
+      } else {
+        next(new NaoEncontrado("A Editora não foi encontrada, verifique e tente novamente", 404));
+      }
     } catch (error) {
       next(error);
     }
@@ -43,7 +50,9 @@ class LivroController {
       const livrosPorAutor = await livro.find({ "autor.nome": autorASerEncontrado });
       if (livrosPorAutor.length > 0){
         res.status(200).json(livrosPorAutor);
-      } else throw new Error;
+      } else {
+        next(new NaoEncontrado("O Autor não foi encontrado, verifique e tente novamente", 404));
+      }
     } catch (error) {
       next(error);
     }
@@ -55,9 +64,17 @@ class LivroController {
     try {
       const autorEncontrado = await autor.findById(novoLivro.autor);
       const editoraEncontrada = await editora.findById(novoLivro.editora);
-      const livroCompleto = { ...novoLivro, autor: { ...autorEncontrado._doc }, editora: { ...editoraEncontrada._doc } };
-      const livroCriado = await livro.create(livroCompleto);
-      res.status(201).json({ message: "Livro criado com sucesso", livro: livroCriado});
+      if (autorEncontrado === null) {
+        next(new NaoEncontrado("O ID do Autor não foi localizado", 404));
+      } else if (editoraEncontrada === null){
+        next(new NaoEncontrado("O ID da Editora não foi localizado", 404));
+      } else if (editoraEncontrada && autorEncontrado !== null){
+        const livroCompleto = { ...novoLivro, autor: { ...autorEncontrado._doc }, editora: { ...editoraEncontrada._doc } };
+        const livroCriado = await livro.create(livroCompleto);
+        res.status(201).json({ message: "Livro criado com sucesso", livro: livroCriado});
+      } else {
+        next(new NaoEncontrado("O ID não foi encontrado", 404));
+      }
     } catch (error) {
       next(error);
     }
@@ -68,8 +85,12 @@ class LivroController {
       const id = req.params.idLivro;
       const novasInformacoes = req.body;
 
-      await livro.findByIdAndUpdate(id, novasInformacoes);
-      res.status(200).json({ message: "Livro alterado com sucesso!"});
+      const livroAtualizado = await livro.findByIdAndUpdate(id, novasInformacoes);
+      if (livroAtualizado !== null){
+        res.status(200).json({ message: "Livro alterado com sucesso!"});
+      } else {
+        next(new NaoEncontrado("ID do livro não encontrado, verifique e tente novamente!", 404));
+      }
     } catch (error) {
       next(error);
     }
@@ -79,8 +100,12 @@ class LivroController {
   static async excluirLivro(req, res, next) {
     try {
       const id = req.params.idLivro;
-      await livro.findByIdAndDelete(id);
-      res.status(200).json({ message: "Livro excluído com sucesso!" });
+      const livroASerExcluido = await livro.findByIdAndDelete(id);
+      if (livroASerExcluido !== null){
+        res.status(200).json({ message: "Livro excluído com sucesso!" });
+      } else {
+        next(new NaoEncontrado("O ID do livro não foi encontrado, verifique e tente novamente, por favor.", 404));
+      }
     } catch (error) {
       next(error);
     }
