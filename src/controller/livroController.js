@@ -1,14 +1,14 @@
-import { livro, autor, editora } from "../models/index.js";
 import NaoEncontrado from "../errors/NaoEncontrado.js";
+import { autor, editora, livro } from "../models/index.js";
 
 class LivroController {
   static async listarLivros(req, res, next) {
     try {
-      const listaLivros = await livro.find()
-        .populate("autor")
-        .exec();
+      const buscaLivros = livro.find();
 
-      res.status(200).json(listaLivros);
+      req.resultado = buscaLivros;
+
+      next();
     } catch (error) {
       next(error);
     }
@@ -68,13 +68,9 @@ class LivroController {
       }
 
       if (busca !== null) {
-        const livrosFiltrados = await livro.find(busca).populate("autor");
-
-        if (livrosFiltrados.length > 0) {
-          res.status(200).json(livrosFiltrados);
-        } else {
-          next(new NaoEncontrado("O campo fornecido não foi encontrado, verifique e tente novamente", 404));
-        }
+        const livrosFiltrados = livro.find(busca).populate("autor");
+        req.resultado = livrosFiltrados;
+        next();
       } else {
         res.status(200).send({message: "Esse autor não possuí nenhum livro na loja"});
       }
