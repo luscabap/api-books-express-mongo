@@ -1,6 +1,6 @@
-import livro from "../models/Livro.js";
-import { autor } from "../models/Autor.js";
-import { editora } from "../models/Editora.js";
+import { livro } from "../models/index.js";
+import { autor } from "../models/index.js";
+import { editora } from "../models/index.js";
 import NaoEncontrado from "../errors/NaoEncontrado.js";
 
 class LivroController {
