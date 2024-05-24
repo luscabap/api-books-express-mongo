@@ -1,6 +1,4 @@
-import { livro } from "../models/index.js";
-import { autor } from "../models/index.js";
-import { editora } from "../models/index.js";
+import { livro, autor, editora } from "../models/index.js";
 import NaoEncontrado from "../errors/NaoEncontrado.js";
 
 class LivroController {
@@ -49,24 +47,38 @@ class LivroController {
 
   static async listarLivroGenerico(req, res, next) {
     try {
-      const { titulo, preco, pag, minPag, maxPag } = req.query;
+      const { titulo, preco, pag, minPag, maxPag, nomeAutor } = req.query;
 
-      // const regexTitulo = new RegExp(titulo, "i");
+      let busca = {};
 
-      const busca = {};
       if (titulo) busca.titulo = { $regex: titulo, $options: "i" };
       if (preco) busca.preco = preco;
       if (pag) busca.paginas = pag;
       if (minPag) busca.paginas = { $gte: minPag };
       if (maxPag) busca.paginas = { $lte: maxPag };
       if (minPag && maxPag) busca.paginas  = { $gte: minPag, $lte: maxPag };
+      if (nomeAutor) {
+        const autorFiltrado = await autor.findOne({ nome: nomeAutor });
 
-      const livrosFiltrados = await livro.find(busca);
-      if (livrosFiltrados.length > 0) {
-        res.status(200).json(livrosFiltrados);
-      } else {
-        next(new NaoEncontrado("O campo fornecido não foi encontrado, verifique e tente novamente", 404));
+        if (autorFiltrado !== null){
+          busca.autor = autorFiltrado._id;
+        } else {
+          busca = null;
+        }
       }
+
+      if (busca !== null) {
+        const livrosFiltrados = await livro.find(busca).populate("autor");
+
+        if (livrosFiltrados.length > 0) {
+          res.status(200).json(livrosFiltrados);
+        } else {
+          next(new NaoEncontrado("O campo fornecido não foi encontrado, verifique e tente novamente", 404));
+        }
+      } else {
+        res.status(200).send({message: "Esse autor não possuí nenhum livro na loja"});
+      }
+
     } catch (error) {
       next(error);
     }
