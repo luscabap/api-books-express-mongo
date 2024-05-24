@@ -31,13 +31,35 @@ class LivroController {
   }
 
   static async listarLivroPorEditora(req, res, next){
-    const editoraASerEncontrada = req.query.editora;
     try {
-      const livrosPorEditora = await livro.find({ "editora.nome": editoraASerEncontrada });
+      const { editora } = req.query;
+
+      const livrosPorEditora = await livro.find({
+        "editora.nome": editora
+      });
       if (livrosPorEditora.length > 0) {
         res.status(200).json(livrosPorEditora);
       } else {
         next(new NaoEncontrado("A Editora não foi encontrada, verifique e tente novamente", 404));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async listarLivroGenerico(req, res, next) {
+    try {
+      const { titulo, preco } = req.query;
+
+      const busca = {};
+      if (titulo) busca.titulo = titulo;
+      if (preco) busca.preco = preco;
+
+      const livrosFiltrados = await livro.find(busca);
+      if (livrosFiltrados.length > 0) {
+        res.status(200).json(livrosFiltrados);
+      } else {
+        next(new NaoEncontrado("O campo fornecido não foi encontrado, verifique e tente novamente", 404));
       }
     } catch (error) {
       next(error);

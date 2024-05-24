@@ -6,7 +6,7 @@ const editoraSchema = new mongoose.Schema({
     type: String,
     required: [true, "O nome da editora é obrigatório"],
     enum: {
-      values: ["Saraiva", "Kalunga"],
+      values: ["Saraiva", "Kalunga", "Teste"],
       message: "A editora {VALUE} não é um valor permitido."
     }
   },
