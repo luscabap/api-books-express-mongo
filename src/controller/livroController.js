@@ -51,8 +51,10 @@ class LivroController {
     try {
       const { titulo, preco } = req.query;
 
+      // const regexTitulo = new RegExp(titulo, "i");
+
       const busca = {};
-      if (titulo) busca.titulo = titulo;
+      if (titulo) busca.titulo = { $regex: titulo, $options: "i" };
       if (preco) busca.preco = preco;
 
       const livrosFiltrados = await livro.find(busca);
