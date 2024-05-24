@@ -49,13 +49,17 @@ class LivroController {
 
   static async listarLivroGenerico(req, res, next) {
     try {
-      const { titulo, preco } = req.query;
+      const { titulo, preco, pag, minPag, maxPag } = req.query;
 
       // const regexTitulo = new RegExp(titulo, "i");
 
       const busca = {};
       if (titulo) busca.titulo = { $regex: titulo, $options: "i" };
       if (preco) busca.preco = preco;
+      if (pag) busca.paginas = pag;
+      if (minPag) busca.paginas = { $gte: minPag };
+      if (maxPag) busca.paginas = { $lte: maxPag };
+      if (minPag && maxPag) busca.paginas  = { $gte: minPag, $lte: maxPag };
 
       const livrosFiltrados = await livro.find(busca);
       if (livrosFiltrados.length > 0) {
